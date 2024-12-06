@@ -8,11 +8,11 @@ pub fn parse_pgn_game(game: &str) -> Game {
 
     // Move information
     let mut move_num: i32 = 0;
-    let mut piece = 0;
-    let mut from_file = 0; // Some moves require disambiguation
-    let mut from_rank = 0; // Some moves require disambiguation
-    let mut file = 0;
-    let mut rank = 0;
+    let mut piece: char = 'x';
+    let mut from_file = 'x'; // Some moves require disambiguation
+    let mut from_rank = 'x'; // Some moves require disambiguation
+    let mut file = 'x';
+    let mut rank = 'x';
     let mut take = false;
     let mut check = false;
     let mut short_castle = false;
@@ -27,7 +27,7 @@ pub fn parse_pgn_game(game: &str) -> Game {
     // Number of O characters that we have seen
     let mut castle_os = 0;
     let mut promotion = false;
-    let mut promotion_to = 0;
+    let mut promotion_to = 'x';
     let mut checkmate = false;
 
     let mut winner = Winner::None;
@@ -55,23 +55,23 @@ pub fn parse_pgn_game(game: &str) -> Game {
                 // Piece
                 'B' | 'N' | 'Q' | 'R' | 'K' => {
                     if promotion {
-                        promotion_to = cur_byte;
+                        promotion_to = cur_char;
                     } else {
-                        piece = cur_byte;
+                        piece = cur_char;
                     }
                 }
                 // File
                 'a'..='h' => {
                     from_file = file;
-                    file = cur_byte;
-                    if piece == 0 {
-                        piece = 80;
+                    file = cur_char;
+                    if piece == 'x' {
+                        piece = 'P';
                     }
                 }
                 // Rank
                 '1'..='8' => {
                     from_rank = rank;
-                    rank = cur_byte;
+                    rank = cur_char;
                 }
                 // Take
                 'x' => {
@@ -139,19 +139,20 @@ pub fn parse_pgn_game(game: &str) -> Game {
                 }
                 if white {
                     let new_ply = Ply::new(piece, from_file, from_rank, file, rank, take, check, short_castle, long_castle, promotion_to, checkmate, analysis);
-                    piece = 0;
-                    from_file = 0;
-                    from_rank = 0;
-                    file = 0;
-                    rank = 0;
+                    piece = 'x';
+                    from_file = 'x';
+                    from_rank = 'x';
+                    file = 'x';
+                    rank = 'x';
                     take = false;
                     check = false;
                     short_castle = false;
                     long_castle = false;
-                    promotion_to = 0;
+                    promotion_to = 'x';
                     analysis = 0;
                     if black {
-                        moves.push(Move::new(move_num, white_ply.unwrap(), Some(new_ply)));
+                        let black_ply = if new_ply.valid() { Some(new_ply) } else { None };
+                        moves.push(Move::new(move_num, white_ply.unwrap(), black_ply));
                         white_ply = None;
                         white = false;
                         black = false;
@@ -177,14 +178,14 @@ pub fn parse_pgn_game(game: &str) -> Game {
     }
 
     let new_game = Game::new(moves, winner);
-    let _a = new_game.to_string();
-    let _b = game.to_string();
-    let games_match = _a == _b;
-
-    if !games_match {
-        println!("{}", game);
-        println!("{}", new_game.to_string());
-    }
+    // let _a = new_game.to_string();
+    // let _b = game.to_string();
+    // let games_match = _a == _b;
+    //
+    // if !games_match {
+    //     println!("{}", game);
+    //     println!("{}", new_game.to_string());
+    // }
 
     return new_game
 }

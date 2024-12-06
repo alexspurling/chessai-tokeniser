@@ -4,23 +4,23 @@ use std::fmt;
 
 #[derive(Debug, Clone)]
 pub struct Ply {
-    piece: u8,
-    from_file: u8,
-    from_rank: u8,
-    file: u8,
-    rank: u8,
-    take: bool,
-    check: bool,
-    short_castle: bool,
-    long_castle: bool,
-    promotion_to: u8,
-    checkmate: bool,
-    analysis: i32,
+    pub piece: char,
+    pub from_file: char,
+    pub from_rank: char,
+    pub file: char,
+    pub rank: char,
+    pub take: bool,
+    pub check: bool,
+    pub short_castle: bool,
+    pub long_castle: bool,
+    pub promotion_to: char,
+    pub checkmate: bool,
+    pub analysis: i32,
 }
 
 impl Ply {
-    pub fn new(piece: u8, from_file: u8, from_rank: u8, file: u8, rank: u8, take: bool, check: bool,
-           short_castle: bool, long_castle: bool, promotion_to: u8, checkmate: bool, analysis: i32) -> Self {
+    pub fn new(piece: char, from_file: char, from_rank: char, file: char, rank: char, take: bool, check: bool,
+           short_castle: bool, long_castle: bool, promotion_to: char, checkmate: bool, analysis: i32) -> Self {
         Ply {
             piece,
             from_file,
@@ -37,8 +37,8 @@ impl Ply {
         }
     }
 
-    fn valid(&self) -> bool {
-        self.piece != 0 || self.short_castle || self.long_castle
+    pub fn valid(&self) -> bool {
+        self.piece != 'x' || self.short_castle || self.long_castle
     }
 
     fn get_analysis_str(analysis: i32) -> &'static str {
@@ -63,13 +63,13 @@ impl fmt::Display for Ply {
         } else if self.long_castle {
             result.push_str("O-O-O");
         } else {
-            if self.piece != 80 {
-                result.push(self.piece as char);
+            if self.piece != 'P' {
+                result.push(self.piece);
             }
-            if self.from_file != 0 {
+            if self.from_file != 'x' {
                 result.push(self.from_file as char);
             }
-            if self.from_rank != 0 {
+            if self.from_rank != 'x' {
                 result.push(self.from_rank as char);
             }
             if self.take {
@@ -77,7 +77,7 @@ impl fmt::Display for Ply {
             }
             result.push(self.file as char);
             result.push(self.rank as char);
-            if self.promotion_to != 0 {
+            if self.promotion_to != 'x' {
                 result.push('=');
                 result.push(self.promotion_to as char);
             }
@@ -119,9 +119,9 @@ impl fmt::Display for Winner {
 
 #[derive(Debug, Clone)]
 pub struct Move {
-    num: i32,
-    white: Ply,
-    black: Option<Ply>,
+    pub num: i32,
+    pub white: Ply,
+    pub black: Option<Ply>,
 }
 
 impl Move {
@@ -142,8 +142,8 @@ impl fmt::Display for Move {
 
 #[derive(Debug, Clone)]
 pub struct Game {
-    moves: Vec<Move>,
-    winner: Winner,
+    pub moves: Vec<Move>,
+    pub winner: Winner,
 }
 
 impl Game {
